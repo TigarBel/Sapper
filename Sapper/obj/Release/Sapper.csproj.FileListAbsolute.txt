@@ -1,0 +1,8 @@
+D:\Винотека\Sapper\Sapper\bin\Release\Sapper.exe.config
+D:\Винотека\Sapper\Sapper\bin\Release\Sapper.exe
+D:\Винотека\Sapper\Sapper\bin\Release\Sapper.pdb
+D:\Винотека\Sapper\Sapper\obj\Release\Sapper.MainFormSapper.resources
+D:\Винотека\Sapper\Sapper\obj\Release\Sapper.Properties.Resources.resources
+D:\Винотека\Sapper\Sapper\obj\Release\Sapper.csproj.GenerateResource.Cache
+D:\Винотека\Sapper\Sapper\obj\Release\Sapper.exe
+D:\Винотека\Sapper\Sapper\obj\Release\Sapper.pdb

@@ -1,0 +1,9 @@
+D:\Винотека\Sapper\Sapper\bin\Debug\Sapper.exe.config
+D:\Винотека\Sapper\Sapper\bin\Debug\Sapper.exe
+D:\Винотека\Sapper\Sapper\bin\Debug\Sapper.pdb
+D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.csprojResolveAssemblyReference.cache
+D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.Properties.Resources.resources
+D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.csproj.GenerateResource.Cache
+D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.exe
+D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.pdb
+D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.MainFormSapper.resources
