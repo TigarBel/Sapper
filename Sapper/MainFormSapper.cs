@@ -35,7 +35,7 @@ namespace Sapper
         private void NewGame_Click(object sender, EventArgs e)
         {
             _field = GenerateField(easeGameLine, easeGameLine, easeGameMine);
-            MarkingField(_field, easeGameLine, easeGameLine);
+            _field = MarkingField(_field, easeGameLine, easeGameLine);
             ClearPictureBoxsField(_pictureBoxsField, easeGameLine, easeGameLine);
             _pictureBoxsField = CreatePictureBoxsField(easeGameLine, easeGameLine);       
         }
@@ -48,7 +48,7 @@ namespace Sapper
                 {
                     for (int j = 0; j < height; j++)
                     {
-                        this.Controls.Remove(pBoxsField[i, j]);
+                        this.Controls.Remove(pBoxsField[j, i]);
                     }
                 }                
             }
@@ -62,17 +62,17 @@ namespace Sapper
             {
                 for (int j = 0; j < height; j++)
                 {
-                    pBoxsField[i, j] = new PictureBox()
+                    pBoxsField[j, i] = new PictureBox()
                     {
                         Name = Convert.ToString(j) + '_' + Convert.ToString(i),
                         Size = new Size(20, 20),
                         Location = new Point(20 * i + 2, 20 * j + 30),
                         Image = Sapper.Properties.Resources.Enable_Field
                     };
-                    pBoxsField[i, j].MouseUp += new MouseEventHandler(pictureBoxsField_MouseUp);
-                    pBoxsField[i, j].MouseUp += new MouseEventHandler(pictureBoxsField_MouseDown);
-                    pBoxsField[i, j].Image.Tag = _enabled;
-                    this.Controls.Add(pBoxsField[i, j]);                    
+                    pBoxsField[j, i].MouseUp += new MouseEventHandler(pictureBoxsField_MouseUp);
+                    pBoxsField[j, i].MouseUp += new MouseEventHandler(pictureBoxsField_MouseDown);
+                    pBoxsField[j, i].Image.Tag = _enabled;
+                    this.Controls.Add(pBoxsField[j, i]);                    
                 }
             }           
             return pBoxsField;
@@ -88,7 +88,7 @@ namespace Sapper
                 //var pictureBoxs = (PictureBox)sender;
                 //int i = Convert.ToInt32(pictureBoxs.Name[0].ToString());
                 //int j = Convert.ToInt32(pictureBoxs.Name[2].ToString());
-                Picture(j, i);
+                Picture(i, j);
                 if (_gameOver)
                 {
                     for (int n = 0; n < _heightArray; n++)
@@ -109,7 +109,7 @@ namespace Sapper
                 //var pictureBoxs = (PictureBox)sender;
                 //int i = Convert.ToInt32(pictureBoxs.Name[0].ToString());
                 //int j = Convert.ToInt32(pictureBoxs.Name[2].ToString());
-                PictureFlag(j, i);
+                PictureFlag(i, j);
                 if (_gameWin == 0)
                 {
                     MessageBox.Show(" Вы победили!");
@@ -129,7 +129,7 @@ namespace Sapper
                 //pictureBoxs.Enabled = false;
                 int i = Convert.ToInt32(pictureBoxs.Name[0].ToString());
                 int j = Convert.ToInt32(pictureBoxs.Name[2].ToString());
-                int numeric = _field[j, i];
+                int numeric = _field[i, j];
 
                 int count = 0;
                 for (int m = i - 1; m <= i + 1; m++)
@@ -169,7 +169,7 @@ namespace Sapper
             }
         }
         //Изменение картинки поля
-        private void /*PictureBox*/ Picture(int width, int height) //_pictureBoxsField
+        private void /*PictureBox*/ Picture(int width, int height) 
         {
             //PictureBox pictureCellField = new PictureBox();
             int numeric = _field[width, height];
@@ -372,7 +372,7 @@ namespace Sapper
             return generateField;
         }
         //Разметить поле(0-пусто;-1-мина;1,2,3...-близость мин)
-        private void MarkingField(int[,] markingField, int width, int height)
+        private int[,] /*void*/ MarkingField(int[,] markingField, int width, int height)
         {
             for (int i = 0; i < width; i++)
             {
@@ -400,6 +400,7 @@ namespace Sapper
                     }
                 }
             }
+            return markingField;
         }
 
         
