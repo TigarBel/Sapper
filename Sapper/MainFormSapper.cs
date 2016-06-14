@@ -13,18 +13,57 @@ namespace Sapper
 {
     public partial class MainFormSapper : Form
     {
+        /// <summary>
+        /// Визуальное поле
+        /// </summary>
         public static PictureBox[,] _pictureBoxsField;
+        /// <summary>
+        /// Ширина массива
+        /// </summary>
         private static int _widthArray;
+        /// <summary>
+        /// Высота массива
+        /// </summary>
         private static int _heightArray;
+        /// <summary>
+        /// Массив внутренний, с числами
+        /// </summary>
         private int[,] _field;
+        /// <summary>
+        /// Тег "Достыпный"
+        /// </summary>
         private const string _enabled = "Enabled";
+        /// <summary>
+        /// Тег "Флаг"
+        /// </summary>
         private const string _flag = "Flag";
+        /// <summary>
+        /// Тег "Не доступный"
+        /// </summary>
         private const string _deactive = "Deactive";
+        /// <summary>
+        /// Подтверждение проигрыша
+        /// </summary>
         private bool _gameOver = false;
+        /// <summary>
+        /// Количество вскрытых клеток и закрытых мин
+        /// </summary>
         private int _gameWin;
+        /// <summary>
+        /// Для вызова ф-ции при клике правой и левой кнопки мыши
+        /// </summary>
         private bool right = false;
+        /// <summary>
+        /// Для вызова ф-ции при клике правой и левой кнопки мыши
+        /// </summary>
         private bool left = false;
+        /// <summary>
+        /// Разиер поля в высоту и ширину для простой игры
+        /// </summary>
         private const int easeGameLine = 9;
+        /// <summary>
+        /// Количество мин для простой игры
+        /// </summary>
         private const int easeGameMine = 10;        
 
         public MainFormSapper()
@@ -285,8 +324,11 @@ namespace Sapper
             }
         }
         //Рекурсивный алгоритм по открыванию пустых клеток
-        private void RunOnZero(int width, int height)
+        private void RunOnZero(int width, int height) 
         {
+            //Ошибка появляется при повторном вызове ф-ции.
+            //При выборе элемента из массива картинок, тег у него равен null.
+            //Когда при проверка самого массива, этот же элемент изменён.
             if (width + 1 < _widthArray)
             {
                 if (_pictureBoxsField[width + 1, height].Image.Tag != _deactive)
