@@ -14,41 +14,13 @@ namespace Sapper
     public partial class MainFormSapper : Form
     {
         /// <summary>
+        /// Объект игры, где проходит вся логига, собственно, игры
+        /// </summary>
+        Game game = new Game();
+        /// <summary>
         /// Визуальное поле
         /// </summary>
-        public static PictureBox[,] _pictureBoxsField;
-        /// <summary>
-        /// Ширина массива
-        /// </summary>
-        private static int _widthArray;
-        /// <summary>
-        /// Высота массива
-        /// </summary>
-        private static int _heightArray;
-        /// <summary>
-        /// Массив внутренний, с числами
-        /// </summary>
-        private int[,] _field;
-        /// <summary>
-        /// Тег "Достыпный"
-        /// </summary>
-        private const string _enabled = "Enabled";
-        /// <summary>
-        /// Тег "Флаг"
-        /// </summary>
-        private const string _flag = "Flag";
-        /// <summary>
-        /// Тег "Не доступный"
-        /// </summary>
-        private const string _deactive = "Deactive";
-        /// <summary>
-        /// Подтверждение проигрыша
-        /// </summary>
-        private bool _gameOver = false;
-        /// <summary>
-        /// Количество вскрытых клеток и закрытых мин
-        /// </summary>
-        private int _gameWin;
+        PictureBox[,] _pictureBoxsField;
         /// <summary>
         /// Для вызова ф-ции при клике правой и левой кнопки мыши
         /// </summary>
@@ -57,105 +29,123 @@ namespace Sapper
         /// Для вызова ф-ции при клике правой и левой кнопки мыши
         /// </summary>
         private bool left = false;
-        /// <summary>
-        /// Разиер поля в высоту и ширину для простой игры
-        /// </summary>
-        private const int easeGameLine = 9;
-        /// <summary>
-        /// Количество мин для простой игры
-        /// </summary>
-        private const int easeGameMine = 10;        
 
+        /// <summary>
+        /// Начало работы программы
+        /// </summary>
         public MainFormSapper()
         {
             InitializeComponent();
         }
-        //Вкладка-кнопка(новая игра)
+        /// <summary>
+        /// Вкладка-кнопка(новая игра)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NewGame_Click(object sender, EventArgs e)
         {
-            _field = GenerateField(easeGameLine, easeGameLine, easeGameMine);
-            _field = MarkingField(_field, easeGameLine, easeGameLine);
-            ClearPictureBoxsField(_pictureBoxsField, easeGameLine, easeGameLine);
-            _pictureBoxsField = CreatePictureBoxsField(easeGameLine, easeGameLine);       
+            game.EaseGame(); // заданы параметры игры
+            game.Begin();
+            game.GameEnded += new DelegateGameEnd(() => GameWin()); // Изначально подписываемся на событие "Вы выиграли!"
+            UpdatePictureField();
         }
-        //Очистка поля от кнопок
-        private void ClearPictureBoxsField(PictureBox[,] pBoxsField, int width, int height)
+        /// <summary>
+        /// Обновление визуального поля
+        /// </summary>
+        private void UpdatePictureField()
         {
-            if (pBoxsField != null)
+            if (this._pictureBoxsField != null) // Чистим поле формы
             {
-                for (int i = 0; i < width; i++)
+                for (int y = 0; y < game.HeightArray; y++)
                 {
-                    for (int j = 0; j < height; j++)
+                    for (int x = 0; x < game.WidthArray; x++)
                     {
-                        this.Controls.Remove(pBoxsField[j, i]);
+                        this.Controls.Remove(this._pictureBoxsField[y, x]);
                     }
-                }                
-            }
-            _gameOver = false;
-        }
-        //Создание и размещения кнопок контроля поля
-        private PictureBox[,] CreatePictureBoxsField(int width, int height)
-        {
-            var pBoxsField = new PictureBox[width, height];
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    pBoxsField[j, i] = new PictureBox()
-                    {
-                        Name = Convert.ToString(j) + '_' + Convert.ToString(i),
-                        Size = new Size(20, 20),
-                        Location = new Point(20 * i + 2, 20 * j + 30),
-                        Image = Sapper.Properties.Resources.Enable_Field
-                    };
-                    pBoxsField[j, i].MouseUp += new MouseEventHandler(pictureBoxsField_MouseUp);
-                    pBoxsField[j, i].MouseUp += new MouseEventHandler(pictureBoxsField_MouseDown);
-                    pBoxsField[j, i].Image.Tag = _enabled;
-                    this.Controls.Add(pBoxsField[j, i]);                    
                 }
-            }           
-            return pBoxsField;
+            }
+            _pictureBoxsField = new PictureBox[game.HeightArray, game.WidthArray]; // Создаём ячейки поля формы
+            for (int y = 0; y < game.HeightArray; y++)
+            {
+                for (int x = 0; x < game.WidthArray; x++)
+                {
+                    _pictureBoxsField[y, x] = new PictureBox()
+                    {
+                        Name = Convert.ToString(x) + '_' + Convert.ToString(y), // Ширина_Высота
+                        Size = new Size(20, 20),
+                        Location = new Point(20 * y + 2, 20 * x + 30),
+                    };
+                    _pictureBoxsField[y, x].MouseUp += new MouseEventHandler(pictureBoxsField_MouseUp);
+                    _pictureBoxsField[y, x].MouseUp += new MouseEventHandler(pictureBoxsField_MouseDown);
+                    this.Controls.Add(_pictureBoxsField[y, x]);
+                }
+            }
+            for (int y = 0; y < game.HeightArray; y++)
+            {
+                for (int x = 0; x < game.WidthArray; x++)
+                {
+                    switch (game.ShowClosedCell(x, y))
+                    {
+                        case 1:
+                            {
+                                Picture(x, y);
+                                break;
+                            }
+                        case 2:
+                            {
+                                _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Enable_Field;
+                                break;
+                            }
+                        case 3:
+                            {
+                                PictureFlag(x, y);
+                                break;
+                            }
+                    }
+                }
+            }
         }
-        //Скрипт при отпускании кнопки мыши
+        /// <summary>
+        /// Скрипт при отпускании кнопки мыши
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pictureBoxsField_MouseUp(object sender, MouseEventArgs e)
         {
             var pictureBoxs = (PictureBox)sender;
-            int i = Convert.ToInt32(pictureBoxs.Name[0].ToString());
-            int j = Convert.ToInt32(pictureBoxs.Name[2].ToString());
+            int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
+            int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
             if (e.Button == MouseButtons.Left)
             {
-                //var pictureBoxs = (PictureBox)sender;
-                //int i = Convert.ToInt32(pictureBoxs.Name[0].ToString());
-                //int j = Convert.ToInt32(pictureBoxs.Name[2].ToString());
-                Picture(i, j);
-                if (_gameOver)
+                if (game.ShowClosedCell(x, y) == 2)
                 {
-                    for (int n = 0; n < _heightArray; n++)
-                    {
-                        for(int m =0;m<_widthArray;m++)
-                        {
-                            Picture(m, n);
-                        }
-                    }
-                }  
-                else if (_gameWin == 0)
+                    game.OpenCell(x, y);
+                }
+                else if (game.ShowClosedCell(x, y) == 3)
                 {
-                    MessageBox.Show(" Вы победили!");
-                }    
+                    game.FieldClosedCell(x, y);
+                    _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Enable_Field;
+                }
             }
             else if (e.Button == MouseButtons.Right)
             {
-                //var pictureBoxs = (PictureBox)sender;
-                //int i = Convert.ToInt32(pictureBoxs.Name[0].ToString());
-                //int j = Convert.ToInt32(pictureBoxs.Name[2].ToString());
-                PictureFlag(i, j);
-                if (_gameWin == 0)
+                if (game.ShowClosedCell(x, y) == 2)
                 {
-                    MessageBox.Show(" Вы победили!");
+                    game.MarkCell(x, y);
+                }
+                else if (game.ShowClosedCell(x, y) == 3)
+                {
+                    game.FieldClosedCell(x, y);
+                    _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Enable_Field;
                 }
             }
+            UpdatePictureField();
         }
-        //Если условие выполняется, открыть клетки вокруг заданной клетки, кроме флажков
+        /// <summary>
+        /// Если условие выполняется, открыть клетки вокруг заданной клетки, кроме флажков
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void pictureBoxsField_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left) // Если нажата левая кнопка мыши
@@ -166,285 +156,145 @@ namespace Sapper
             {
                 var pictureBoxs = (PictureBox)sender;
                 //pictureBoxs.Enabled = false;
-                int i = Convert.ToInt32(pictureBoxs.Name[0].ToString());
-                int j = Convert.ToInt32(pictureBoxs.Name[2].ToString());
-                int numeric = _field[i, j];
+                int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
+                int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
+                int numeric = game.Field(x, y);
 
                 int count = 0;
-                for (int m = i - 1; m <= i + 1; m++)
+                for (int y2 = y - 1; y2 <= y + 1; y2++)
                 {
-                    for (int k = j - 1; k <= j + 1; k++)
+                    for (int x2 = x - 1; x2 <= x + 1; x2++)
                     {
-                        if (m >= 0 && k >= 0
-                            && m <= i + 1 && k <= j + 1
-                            && m < _heightArray && k < _widthArray)
+                        if (x2 >= 0 && y2 >= 0
+                            && x2 <= x + 1 && y2 <= y + 1
+                            && x2 < game.WidthArray && y2 < game.HeightArray)
                          {
-                            if (_pictureBoxsField[k, m].Tag == _flag)
+                            if (game.ShowClosedCell(x2, y2) == 3)
                             {
-                                count++;
+                                count++; // Считаем, сколько флагов вокрук ячейки
                             }
                         }
                     }
                 }
                 if (count == numeric)
                 {
-                    for (int m = i - 1; m <= i + 1; m++)
+                    for (int y2 = y - 1; y2 <= y + 1; y2++)
                     {
-                        for (int k = j - 1; k <= j + 1; k++)
+                        for (int x2 = x - 1; x2 <= x + 1; x2++)
                         {
-                            if (m >= 0 && k >= 0
-                                && m <= i + 1 && k <= j + 1
-                                && m < _heightArray && k < _widthArray)
+                            if (y2 >= 0 && x2 >= 0
+                                && y2 <= x + 1 && x2 <= y + 1
+                                && y2 < game.HeightArray && x2 < game.WidthArray)
                             {
-                                if (_pictureBoxsField[k, m].Tag != _flag)
+                                if (game.ShowClosedCell(x2, y2) != 3)
                                 {
-                                    Picture(k, m);
+                                    Picture(x2, y2);
                                 }
                             }
                         }
                     }
                 }
                 right = left = false;
+                UpdatePictureField();
             }
         }
-        //Изменение картинки поля
-        private void /*PictureBox*/ Picture(int width, int height) 
+        /// <summary>
+        /// Изменение картинки поля
+        /// </summary>
+        /// <param name="x">Ширина</param>
+        /// <param name="y">Высота</param>
+        private void Picture(int x, int y) 
         {
-            //PictureBox pictureCellField = new PictureBox();
-            int numeric = _field[width, height];
-            if (_pictureBoxsField[width, height].Tag == _flag && _gameOver && numeric == -1)
-            {
-                _pictureBoxsField[width, height].Image = Sapper.Properties.Resources.Defused_Mine_Field;
-                _pictureBoxsField[width, height].Tag = _deactive;
-            }
-            else if (_pictureBoxsField[width, height].Tag == _flag && _gameOver && numeric != -1)
-            {
-                _pictureBoxsField[width, height].Image = Sapper.Properties.Resources.NonDefused_Mine_Field;
-                _pictureBoxsField[width, height].Tag = _deactive;
-            }
-            else if (_pictureBoxsField[width, height].Tag == _flag)
-            {
-                _pictureBoxsField[width, height].Image = Sapper.Properties.Resources.Enable_Field;
-                _pictureBoxsField[width, height].Tag = _enabled;
-                _gameWin++; // Сбрасываем защитанную клетку поля
-            }
-            else switch (numeric)
+            int numeric = game.Field(x, y);
+            
+            switch (numeric)
             {
                 case -1:
-                        {
-                            _gameOver = true;
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources.Mine_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            break; // Проигрыш 
-                        }
-                case 0:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._0_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            //RunOnZero(width, height);
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 1:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._1_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 2:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._2_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 3:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._3_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 4:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._4_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 5:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._5_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 6:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._6_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 7:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._7_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-                case 8:
-                        {
-                            _pictureBoxsField[width, height].Image = Sapper.Properties.Resources._8_Field;
-                            _pictureBoxsField[width, height].Tag = _deactive;
-                            _gameWin--; // Защитываем клетку поля
-                            break;
-                        }
-            }
-            //return pictureCellField;
-        }
-        //Изменение картинки поля на флаг
-        private void PictureFlag(int width, int height)
-        {
-            if (_pictureBoxsField[width, height].Tag != _deactive)
-            {
-                if (_pictureBoxsField[width, height].Tag != _flag)
-                {
-                    _pictureBoxsField[width, height].Image = Sapper.Properties.Resources.Flag;
-                    _pictureBoxsField[width, height].Tag = _flag;
-                    _gameWin--; // Защитываем клетку поля
-                }
-                else
-                {
-                    _pictureBoxsField[width, height].Image = Sapper.Properties.Resources.Enable_Field;
-                    _pictureBoxsField[width, height].Tag = _enabled;
-                    _gameWin++; // Сбрасываем защитанную клетку поля
-                }
-            }
-        }
-        //Рекурсивный алгоритм по открыванию пустых клеток
-        private void RunOnZero(int width, int height) 
-        {
-            //Ошибка появляется при повторном вызове ф-ции.
-            //При выборе элемента из массива картинок, тег у него равен null.
-            //Когда при проверка самого массива, этот же элемент изменён.
-            if (width + 1 < _widthArray)
-            {
-                if (_pictureBoxsField[width + 1, height].Image.Tag != _deactive)
-                {
-                    Picture(width + 1, height);
-                }
-            }
-
-            if (width + 1 < _widthArray && height + 1 < _heightArray)
-            {
-                if (_pictureBoxsField[height + 1, width + 1].Image.Tag != _deactive)
-                {
-                    Picture(width + 1, height + 1);
-                }
-            }
-
-            if (height + 1 < _heightArray)
-            {
-                if (_pictureBoxsField[width, height + 1].Image.Tag != _deactive)
-                {
-                    Picture(width, height + 1);
-                }
-            }
-
-            if (width - 1 >= 0 && height + 1 < _heightArray)
-            {
-                if (_pictureBoxsField[height + 1, width - 1].Image.Tag != _deactive)
-                {
-                    Picture(width - 1, height + 1);
-                }
-            }
-
-            if (width - 1 >= 0)
-            {
-                if (_pictureBoxsField[width - 1, height].Image.Tag != _deactive)
-                {
-                    Picture(width - 1, height);
-                }
-            }
-
-            if (width - 1 >= 0 && height - 1 >= 0)
-            {
-                if (_pictureBoxsField[height - 1, width - 1].Image.Tag != _deactive)
-                {
-                    Picture(width - 1, height - 1);
-                }
-            }
-
-            if (height - 1 >= 0)
-            {
-                if (_pictureBoxsField[width, height - 1].Image.Tag != _deactive)
-                {
-                    Picture(width, height - 1);
-                }
-            }
-
-            if (width + 1 < _widthArray && height - 1 >= 0)
-            {
-                if (_pictureBoxsField[width + 1, height - 1].Image.Tag != _deactive)
-                {
-                    Picture(width + 1, height - 1);
-                }
-            }
-        }
-        //Создание поля с расставленными минами
-        private int[,] GenerateField(int width, int height, int mine)
-        {
-            _widthArray = width;
-            _heightArray = height;
-            _gameWin = _widthArray * _heightArray; // Сколько должно быть клеток в поле для выйгрыша
-            int count = mine;
-            int[,] generateField = new int[easeGameLine, easeGameLine];
-            while (count > 0)
-            {
-                int i = new Random().Next(width);
-                int j = new Random().Next(height);
-                if (generateField[i, j] != -1)
-                {
-                    generateField[i, j] = -1;
-                    count--;
-                }
-            }
-            return generateField;
-        }
-        //Разметить поле(0-пусто;-1-мина;1,2,3...-близость мин)
-        private int[,] /*void*/ MarkingField(int[,] markingField, int width, int height)
-        {
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    if (markingField[i, j] != -1)
                     {
-                        int count = 0;
-                        for (int m = i - 1; m <= i + 1; m++)
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Mine_Field;
+                        if (!game.GameOver) // если пока не объявили о проигрыше
                         {
-                            for (int k = j - 1; k <= j + 1; k++)
-                            {
-                                if (m >= 0 && k >= 0 
-                                    && m <= i + 1 && k <= j + 1 
-                                    && m < width && k < height)
-                                {
-                                    if (markingField[m, k] == -1)
-                                    {
-                                        count++;
-                                    }
-                                }
-                            }
+                            game.GameEnded -= new DelegateGameEnd(() => GameWin()); // Отменяем подписку на событие "Вы выиграли!"
                         }
-                        markingField[i, j] = count;
+                        game.GameEnded += new DelegateGameEnd(() => GameOver()); // Подписываемся на событие "Вы проиграли!"
+                        break; // Проигрыш 
                     }
+                case 0:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._0_Field;
+                        break;
+                    }
+                case 1:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._1_Field;
+                        break;
+                    }
+                case 2:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._2_Field;
+                        break;
+                    }
+                case 3:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._3_Field;
+                        break;
+                    }
+                case 4:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._4_Field;
+                        break;
+                    }
+                case 5:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._5_Field;
+                        break;
+                    }
+                case 6:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._6_Field;
+                        break;
+                    }
+                case 7:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._7_Field;
+                        break;
+                    }
+                case 8:
+                    {
+                        _pictureBoxsField[y, x].Image = Sapper.Properties.Resources._8_Field;
+                        break;
+                    }
+            }
+        }
+        /// <summary>
+        /// Изменение картинки поля на флаг
+        /// </summary>
+        /// <param name="x">Ширина</param>
+        /// <param name="y">Высота</param>
+        private void PictureFlag(int x, int y)
+        {
+            _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Flag;
+        }
+        /// <summary>
+        /// Метод выигрыша для события по окончанию игры
+        /// </summary>
+        public void GameWin()
+        {
+            MessageBox.Show(" Вы победили!");
+        }
+        /// <summary>
+        /// Метод проигрыша для события по окончанию игры
+        /// </summary>
+        public void GameOver()
+        {
+            for (int y = 0; y < game.HeightArray; y++)
+            {
+                for (int x = 0; x < game.WidthArray; x++)
+                {
+                    game.OpenCell(x, y);
                 }
             }
-            return markingField;
+            UpdatePictureField();
         }
-
-        
     }
 }
