@@ -75,7 +75,7 @@ namespace Sapper
                         Location = new Point(20 * y + 2, 20 * x + 30),
                     };
                     _pictureBoxsField[y, x].MouseUp += new MouseEventHandler(pictureBoxsField_MouseUp);
-                    _pictureBoxsField[y, x].MouseUp += new MouseEventHandler(pictureBoxsField_MouseDown);
+                    _pictureBoxsField[y, x].MouseDown += new MouseEventHandler(pictureBoxsField_MouseDown);
                     this.Controls.Add(_pictureBoxsField[y, x]);
                 }
             }
@@ -138,6 +138,7 @@ namespace Sapper
                     _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Enable_Field;
                 }
             }
+            left = right = false; // Чтобы не вызвать следом ф-цию по открыванию вокруг клеток
             UpdatePictureField(); // Обновляем визуальное поле
         }
         /// <summary>
