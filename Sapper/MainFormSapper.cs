@@ -46,7 +46,6 @@ namespace Sapper
         {
             game.EaseGame(); // заданы параметры игры
             game.Begin();
-            game.GameEnded += new DelegateGameEnd(() => GameWin()); // Изначально подписываемся на событие "Вы выиграли!"
             UpdatePictureField();
         }
         /// <summary>
@@ -139,7 +138,7 @@ namespace Sapper
                     _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Enable_Field;
                 }
             }
-            UpdatePictureField();
+            UpdatePictureField(); // Обновляем визуальное поле
         }
         /// <summary>
         /// Если условие выполняется, открыть клетки вокруг заданной клетки, кроме флажков
@@ -182,20 +181,20 @@ namespace Sapper
                     {
                         for (int x2 = x - 1; x2 <= x + 1; x2++)
                         {
-                            if (y2 >= 0 && x2 >= 0
-                                && y2 <= x + 1 && x2 <= y + 1
-                                && y2 < game.HeightArray && x2 < game.WidthArray)
+                            if (x2 >= 0 && y2 >= 0
+                                && x2 <= x + 1 && y2 <= y + 1
+                                && x2 < game.WidthArray && y2 < game.HeightArray)
                             {
                                 if (game.ShowClosedCell(x2, y2) != 3)
                                 {
-                                    Picture(x2, y2);
+                                    game.OpenCell(x2, y2); // Открываем во внутреннем массиве
                                 }
                             }
                         }
                     }
                 }
                 right = left = false;
-                UpdatePictureField();
+                UpdatePictureField(); // Обновляем визуальное поле
             }
         }
         /// <summary>
@@ -212,11 +211,11 @@ namespace Sapper
                 case -1:
                     {
                         _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Mine_Field;
-                        if (!game.GameOver) // если пока не объявили о проигрыше
-                        {
-                            game.GameEnded -= new DelegateGameEnd(() => GameWin()); // Отменяем подписку на событие "Вы выиграли!"
-                        }
-                        game.GameEnded += new DelegateGameEnd(() => GameOver()); // Подписываемся на событие "Вы проиграли!"
+                        //if (!game.GameOver) // если пока не объявили о проигрыше
+                        //{
+                        //    game.GameEnded -= new DelegateGameEnd(() => GameWin()); // Отменяем подписку на событие "Вы выиграли!"
+                        //}
+                        //game.GameEnded += new DelegateGameEnd(() => GameOver()); // Подписываемся на событие "Вы проиграли!"
                         break; // Проигрыш 
                     }
                 case 0:
@@ -274,27 +273,6 @@ namespace Sapper
         private void PictureFlag(int x, int y)
         {
             _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Flag;
-        }
-        /// <summary>
-        /// Метод выигрыша для события по окончанию игры
-        /// </summary>
-        public void GameWin()
-        {
-            MessageBox.Show(" Вы победили!");
-        }
-        /// <summary>
-        /// Метод проигрыша для события по окончанию игры
-        /// </summary>
-        public void GameOver()
-        {
-            for (int y = 0; y < game.HeightArray; y++)
-            {
-                for (int x = 0; x < game.WidthArray; x++)
-                {
-                    game.OpenCell(x, y);
-                }
-            }
-            UpdatePictureField();
         }
     }
 }

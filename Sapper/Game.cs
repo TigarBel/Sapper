@@ -38,11 +38,15 @@ namespace Sapper
         /// <summary>
         /// Подтверждение проигрыша
         /// </summary>
-        private bool _gameOver = false;
+        private bool _gameOver;
         /// <summary>
         /// Количество вскрытых клеток и закрытых мин
         /// </summary>
-        private int _gameWin;
+        private bool _gameWin;
+        /// <summary>
+        /// Количество очков для выигрыша
+        /// </summary>
+        private int _pointsForWin;
         /// <summary>
         /// Разиер поля в высоту и ширину для лёгкой игры
         /// </summary>
@@ -61,15 +65,38 @@ namespace Sapper
         public bool GameOver
         {
             get { return _gameOver; }
-            private set { _gameOver = value; }
+            private set
+            {
+                if (value == true)
+                {
+                    _gameOver = value;
+                    GameEnded += new DelegateGameEnd(() => BadEnd());// Подписываемся на событие "Вы проиграли!"
+                    PointsForWin = -1;
+                }
+            }
         }
         /// <summary>
         /// Свойство по проверки выигрыша. Если полученное число равно 0, то открыты (проверенны) все ячейки массива
         /// </summary>
-        private int GameWin
+        public bool GameWin
         {
             get { return _gameWin; }
-            set { _gameWin = value; }
+        }
+        /// <summary>
+        /// Количество очков для выигрыша
+        /// </summary>
+        private int PointsForWin
+        {
+            get { return _pointsForWin; }
+            set
+            {
+                _pointsForWin = value;
+                if (_pointsForWin == 0)
+                {
+                    _gameWin = true;
+                    GameEnded += new DelegateGameEnd(() => GoodEnd());// Подписываемся на событие "Вы выиграли!"
+                }
+            }
         }
         /// <summary>
         /// Ширина массива (игрового поля)
@@ -156,7 +183,8 @@ namespace Sapper
             { throw new ArgumentException(" Не корректная высота!"); }
             if (x < 0 || x > WidthArray)
             { throw new ArgumentException(" Не корректная ширина!"); }
-            _fieldClosedCell[y, x] = 1;
+            _fieldClosedCell[y, x] = 2;
+            PointsForWin++; // Закрываем ячейку
         }
         /// <summary>
         /// Обозначить ячейку поля помеченной (поставить флажок)
@@ -201,12 +229,15 @@ namespace Sapper
         {
             GenerateField();
             MarkingField();
+            GameEnded = null;
         }
         /// <summary>
         /// Генерация, создание поля с расставленными минами
         /// </summary>
         private void GenerateField()
         {
+            _gameOver = false;
+            _gameWin = false;
             int count = Mine;
             if (HeightArray == 0)
             {
@@ -222,7 +253,7 @@ namespace Sapper
             }
             _field = new int[HeightArray, WidthArray];
             _fieldClosedCell = new int[HeightArray, WidthArray];
-            GameWin = HeightArray * WidthArray; // Количество открытых (проверенных) клеток для победы
+            PointsForWin = HeightArray * WidthArray; // Количество открытых (проверенных) клеток для победы
             while (count > 0)
             {
                 int y = new Random().Next(HeightArray);
@@ -277,14 +308,13 @@ namespace Sapper
         public void OpenCell(int x, int y)
         {
             FieldOpenCell(x, y);
-            GameWin--; // Ещё одна ячейка открыта
+            PointsForWin--; // Ещё одна ячейка открыта
             if (Field(x, y) == -1) // Встал на мину. Вызов события "Конец игры!"  
             {
                 GameOver = true;
-                GameEnded();
             }
             if (Field(x, y) == 0) { RunOnZero(x, y); } // Вызов рекурсивной ф-ции по открытию массива
-            if (GameWin == 0) // Вызов события "Вы выиграли!"
+            if (GameEnded != null) // Вызов события
             {
                 GameEnded();
             }
@@ -297,8 +327,8 @@ namespace Sapper
         public void MarkCell(int x, int y)
         {
             FieldMarkCell(x, y);
-            GameWin--; // Ещё одна ячейка открыта
-            if (GameWin == 0) // Вызов события "Вы выиграли!"
+            PointsForWin--; // Ещё одна ячейка открыта
+            if (GameWin == true) // Вызов события "Вы выиграли!"
             {
                 GameEnded();
             }
@@ -319,7 +349,7 @@ namespace Sapper
             }
             if (x + 1 < WidthArray && y + 1 < HeightArray) // вправо и вниз
             {
-                if (ShowClosedCell(y + 1, x + 1) != 1)
+                if (ShowClosedCell(x + 1, y + 1) != 1)
                 {
                     OpenCell(x + 1, y + 1);
                 }
@@ -333,7 +363,7 @@ namespace Sapper
             }
             if (x - 1 >= 0 && y + 1 < HeightArray) // влево и вниз
             {
-                if (ShowClosedCell(y + 1, x - 1) != 1)
+                if (ShowClosedCell(x - 1, y + 1) != 1)
                 {
                     OpenCell(x - 1, y + 1);
                 }
@@ -347,7 +377,7 @@ namespace Sapper
             }
             if (x - 1 >= 0 && y - 1 >= 0) // влево и вверх
             {
-                if (ShowClosedCell(y - 1, x - 1) != 1)
+                if (ShowClosedCell(x - 1, y - 1) != 1)
                 {
                     OpenCell(x - 1, y - 1);
                 }
@@ -364,6 +394,36 @@ namespace Sapper
                 if (ShowClosedCell(x + 1, y - 1) != 1)
                 {
                     OpenCell(x + 1, y - 1);
+                }
+            }
+        }
+        /// <summary>
+        /// Метод проигрыша для события по окончанию игры
+        /// </summary>
+        public void BadEnd()
+        {
+            for (int y = 0; y < HeightArray; y++)
+            {
+                for (int x = 0; x < WidthArray; x++)
+                {
+                    //if(game.ShowClosedCell(x,y) == 3 && game.Field(x,y)==-1)
+                    //{ _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Defused_Mine_Field; }
+                    //else if (game.ShowClosedCell(x, y) == 3 && game.Field(x, y) != -1)
+                    //{ _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.NonDefused_Mine_Field; }
+                    FieldOpenCell(x, y);
+                }
+            }
+        }
+        /// <summary>
+        /// Метод выигрыша для события по окончанию игры // тут будет смайлик в очках
+        /// </summary>
+        public void GoodEnd()
+        {
+            for (int y = 0; y < HeightArray; y++)
+            {
+                for (int x = 0; x < WidthArray; x++)
+                {
+                    MarkCell(x, y);
                 }
             }
         }
