@@ -307,6 +307,14 @@ namespace Sapper
         /// <returns>(0-пусто;-1-мина;1,2,3...-близость мин)</returns>
         public void OpenCell(int x, int y)
         {
+            if (y <= 0 && y >= HeightArray)
+            {
+                throw new ArgumentException(" При открытии поля, введенное значение высоты не коректно!");
+            }
+            if (x <= 0 && x >= WidthArray)
+            {
+                throw new ArgumentException(" При открытии поля, введенное значение ширины не коректно!");
+            }
             FieldOpenCell(x, y);
             PointsForWin--; // Ещё одна ячейка открыта
             if (Field(x, y) == -1) // Встал на мину. Вызов события "Конец игры!"  
@@ -326,6 +334,14 @@ namespace Sapper
         /// <param name="y">Высота</param>
         public void MarkCell(int x, int y)
         {
+            if (y <= 0 && y >= HeightArray)
+            {
+                throw new ArgumentException(" При макркировки поля, введенное значение высоты не коректно!");
+            }
+            if (x <= 0 && x >= WidthArray)
+            {
+                throw new ArgumentException(" При макркировки поля, введенное значение ширины не коректно!");
+            }
             FieldMarkCell(x, y);
             PointsForWin--; // Ещё одна ячейка открыта
             if (GameWin == true) // Вызов события "Вы выиграли!"

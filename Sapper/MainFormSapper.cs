@@ -154,7 +154,6 @@ namespace Sapper
             if (right && left) // Если нажата обе кнопки мыши
             {
                 var pictureBoxs = (PictureBox)sender;
-                //pictureBoxs.Enabled = false;
                 int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
                 int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
                 int numeric = game.Field(x, y);
@@ -165,6 +164,7 @@ namespace Sapper
                     for (int x2 = x - 1; x2 <= x + 1; x2++)
                     {
                         if (x2 >= 0 && y2 >= 0
+                            //&& x2 != x && y2 != y // Обманка, без неё можно открывать поле.
                             && x2 <= x + 1 && y2 <= y + 1
                             && x2 < game.WidthArray && y2 < game.HeightArray)
                          {
@@ -211,11 +211,6 @@ namespace Sapper
                 case -1:
                     {
                         _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Mine_Field;
-                        //if (!game.GameOver) // если пока не объявили о проигрыше
-                        //{
-                        //    game.GameEnded -= new DelegateGameEnd(() => GameWin()); // Отменяем подписку на событие "Вы выиграли!"
-                        //}
-                        //game.GameEnded += new DelegateGameEnd(() => GameOver()); // Подписываемся на событие "Вы проиграли!"
                         break; // Проигрыш 
                     }
                 case 0:
