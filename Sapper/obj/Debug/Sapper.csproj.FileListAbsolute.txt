@@ -7,3 +7,12 @@ D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.csproj.GenerateResource.Cache
 D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.exe
 D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.pdb
 D:\Винотека\Sapper\Sapper\obj\Debug\Sapper.MainFormSapper.resources
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\bin\Debug\Sapper.exe.config
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\bin\Debug\Sapper.exe
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\bin\Debug\Sapper.pdb
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\obj\Debug\Sapper.csprojResolveAssemblyReference.cache
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\obj\Debug\Sapper.MainFormSapper.resources
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\obj\Debug\Sapper.Properties.Resources.resources
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\obj\Debug\Sapper.csproj.GenerateResource.Cache
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\obj\Debug\Sapper.exe
+C:\Users\aleksandr.goryainov\Source\Repos\Sapper\Sapper\obj\Debug\Sapper.pdb
