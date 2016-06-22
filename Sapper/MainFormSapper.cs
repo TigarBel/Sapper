@@ -16,7 +16,7 @@ namespace Sapper
         /// <summary>
         /// Объект игры, где проходит вся логига, собственно, игры
         /// </summary>
-        Game game = new Game();
+        Game game;
         /// <summary>
         /// Визуальное поле
         /// </summary>
@@ -44,8 +44,7 @@ namespace Sapper
         /// <param name="e"></param>
         private void NewGame_Click(object sender, EventArgs e)
         {
-            game.EaseGame(); // заданы параметры игры
-            game.Begin();
+            game = new Game(); // Создали новую игру с настройками по дефолту
             UpdatePictureField();
         }
         /// <summary>
