@@ -45,7 +45,38 @@ namespace Sapper
         private void NewGame_Click(object sender, EventArgs e)
         {
             game = new Game(); // Создали новую игру с настройками по дефолту
+            game.GameEnded += game_GameEnded;
             UpdatePictureField();
+        }
+        /// <summary>
+        /// Событие при завершении игры
+        /// </summary>
+        /// <param name="points">Итог в очках, выигрыл или проигрыш</param>
+        void game_GameEnded(int points)
+        {
+            if (points == 0) MessageBox.Show("Вы выиграли!"); // Выигрыш
+            if (points == -1) GameOver(); // Проигрыш
+        }
+        /// <summary>
+        /// Ф-ция под событие для окончания игры, как проигрыш
+        /// </summary>
+        private void GameOver()
+        {
+            for (int y = 0; y < game.HeightArray; y++)
+            {
+                for (int x = 0; x < game.WidthArray; x++)
+                {
+                    if (game.ShowClosedCell(x, y) == 3 && game.Field(x, y) == -1)
+                    {   // Если обезвредили мину на данной ячейке
+                        game.DefusedCell(x, y);
+                    }
+                    else if (game.ShowClosedCell(x, y) == 3 && game.Field(x, y) != -1)
+                    {   // Если не обезвредили мину на данной ячейке
+                        game.NonDefusedCell(x, y);
+                    }   // Иначе просто открываем данную ячейку
+                    else if (game.ShowClosedCell(x, y) == 2) game.OpenCell(x, y);
+                }
+            }
         }
         /// <summary>
         /// Обновление визуального поля
@@ -85,18 +116,28 @@ namespace Sapper
                     switch (game.ShowClosedCell(x, y))
                     {
                         case 1:
-                            {
+                            {   // Вырисовываем ячейку
                                 Picture(x, y);
                                 break;
                             }
                         case 2:
-                            {
+                            {   // Вырисовываем закрутую ячейку
                                 _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Enable_Field;
                                 break;
                             }
                         case 3:
-                            {
+                            {   // Вырисовываем флаг
                                 PictureFlag(x, y);
+                                break;
+                            }
+                        case 4:
+                            {   // Вырисовываем мину с другим фоном
+                                _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Defused_Mine_Field;
+                                break;
+                            }
+                        case 5:
+                            {   // Вырисовываем перечёркнутую мину
+                                _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.NonDefused_Mine_Field;
                                 break;
                             }
                     }
@@ -185,7 +226,7 @@ namespace Sapper
                                 && x2 <= x + 1 && y2 <= y + 1
                                 && x2 < game.WidthArray && y2 < game.HeightArray)
                             {
-                                if (game.ShowClosedCell(x2, y2) != 3)
+                                if (game.ShowClosedCell(x2, y2) == 2)
                                 {
                                     game.OpenCell(x2, y2); // Открываем во внутреннем массиве
                                 }
