@@ -7,6 +7,15 @@ using System.Threading.Tasks;
 namespace Sapper
 {
     /// <summary>
+    /// Игровая сложность
+    /// </summary>
+    public enum GameDifficulty
+    {
+        Easy = 1,
+        Medium,
+        Hard
+    };
+    /// <summary>
     /// Делегат для вызова события "Завершить игру"
     /// </summary>
     public delegate void DelegateGameEnd(int points);
@@ -112,19 +121,60 @@ namespace Sapper
             }
             set
             {
-                if (HeightArray >= 9 && HeightArray <= 16 && // Нужная высота у поля
-                    WidthArray >= 9 && WidthArray <= 30 &&  // Нужная ширина у поля
-                    value >= 10 && value <= 100 &&  // Нужное количество мин
+                if (value >= 10 &&  // Нужное количество мин
                     value <= (HeightArray * WidthArray) / 2) // Количество мин не превышает площадь поля, максимум 2 свободных поля
                 { _mine = value; }
+                else throw new ArgumentException("Количество мин не может быть больше половины количества ячеек поля, и меньше 10!");
             }
         }
 
-        public Game()
+        /// <summary>
+        /// Дефолтный конструктор класса Game
+        /// </summary>
+        /// <param name="gameDifficulty">Игровая сложность</param>
+        public Game(GameDifficulty gameDifficulty)
         {
-            _field = new int[9, 9]; // Создаём пустое поле близости мин
-            _fieldClosedCell = new int[9, 9]; // Создаём пустое поле закрытых ячеек
-            Mine = 10;
+            switch (gameDifficulty)
+            {
+                case GameDifficulty.Easy:
+                    {
+                        _field = new int[9, 9]; // Создаём пустое поле близости мин
+                        _fieldClosedCell = new int[9, 9]; // Создаём пустое поле закрытых ячеек
+                        Mine = 10;
+                        GenerateField(); // Генерируем поле
+                        break;
+                    }
+                case GameDifficulty.Medium:
+                    {
+                        _field = new int[16, 16]; // Создаём пустое поле близости мин
+                        _fieldClosedCell = new int[16, 16]; // Создаём пустое поле закрытых ячеек
+                        Mine = 50;
+                        GenerateField(); // Генерируем поле
+                        break;
+                    }
+                case GameDifficulty.Hard:
+                    {
+                        _field = new int[30, 16]; // Создаём пустое поле близости мин
+                        _fieldClosedCell = new int[30, 16]; // Создаём пустое поле закрытых ячеек
+                        Mine = 99;
+                        GenerateField(); // Генерируем поле
+                        break;
+                    }
+            }
+        }
+        /// <summary>
+        /// Конструктор с водои параметр для класса Game
+        /// </summary>
+        /// <param name="x">Ширина поля</param>
+        /// <param name="y">Высота поля</param>
+        /// <param name="mine">Количество мин</param>
+        public Game(int x, int y, int mine)
+        {
+            if (x < 9 || x > 30) throw new ArgumentException("Ширина поля не может быть меньше 9 или больше 30 ячеек!");
+            if (y < 9 || y > 24) throw new ArgumentException("Высота поля не может быть меньше 9 или больше 24 ячеек!");
+            _field = new int[y, x]; // Создаём пустое поле близости мин
+            _fieldClosedCell = new int[y, x]; // Создаём пустое поле закрытых ячеек
+            Mine = mine;
             GenerateField(); // Генерируем поле
         }
         /// <summary>

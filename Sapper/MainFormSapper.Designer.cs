@@ -30,26 +30,53 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainFormSapper));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.NewGame = new System.Windows.Forms.ToolStripMenuItem();
+            this.GameMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.easyGame = new System.Windows.Forms.ToolStripMenuItem();
+            this.mediunGame = new System.Windows.Forms.ToolStripMenuItem();
+            this.hardGame = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.NewGame});
+            this.GameMenu});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(184, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
-            // NewGame
+            // GameMenu
             // 
-            this.NewGame.Name = "NewGame";
-            this.NewGame.Size = new System.Drawing.Size(76, 20);
-            this.NewGame.Text = "New game";
-            this.NewGame.Click += new System.EventHandler(this.NewGame_Click);
+            this.GameMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.easyGame,
+            this.mediunGame,
+            this.hardGame});
+            this.GameMenu.Name = "GameMenu";
+            this.GameMenu.Size = new System.Drawing.Size(50, 20);
+            this.GameMenu.Text = "Game";
+            // 
+            // easyGame
+            // 
+            this.easyGame.Name = "easyGame";
+            this.easyGame.Size = new System.Drawing.Size(152, 22);
+            this.easyGame.Text = "Easy Game";
+            this.easyGame.Click += new System.EventHandler(this.easyGame_Click);
+            // 
+            // mediunGame
+            // 
+            this.mediunGame.Name = "mediunGame";
+            this.mediunGame.Size = new System.Drawing.Size(152, 22);
+            this.mediunGame.Text = "Mediun Game";
+            this.mediunGame.Click += new System.EventHandler(this.mediunGame_Click);
+            // 
+            // hardGame
+            // 
+            this.hardGame.Name = "hardGame";
+            this.hardGame.Size = new System.Drawing.Size(152, 22);
+            this.hardGame.Text = "Hard Game";
+            this.hardGame.Click += new System.EventHandler(this.hardGame_Click);
             // 
             // MainFormSapper
             // 
@@ -58,7 +85,6 @@
             this.ClientSize = new System.Drawing.Size(184, 214);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.menuStrip1;
             this.MaximumSize = new System.Drawing.Size(200, 253);
             this.MinimumSize = new System.Drawing.Size(200, 253);
             this.Name = "MainFormSapper";
@@ -73,7 +99,10 @@
         #endregion
 
         private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem NewGame;
+        private System.Windows.Forms.ToolStripMenuItem GameMenu;
+        private System.Windows.Forms.ToolStripMenuItem easyGame;
+        private System.Windows.Forms.ToolStripMenuItem mediunGame;
+        private System.Windows.Forms.ToolStripMenuItem hardGame;
     }
 }
 

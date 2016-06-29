@@ -38,13 +38,41 @@ namespace Sapper
             InitializeComponent();
         }
         /// <summary>
-        /// Вкладка-кнопка(новая игра)
+        /// Новая игра лёгкой сложности
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void NewGame_Click(object sender, EventArgs e)
+        private void easyGame_Click(object sender, EventArgs e)
         {
-            game = new Game(); // Создали новую игру с настройками по дефолту
+            this.MinimumSize = new Size(200, 253);
+            this.MaximumSize = new Size(200, 253);
+            game = new Game(GameDifficulty.Easy); // Создали новую игру с настройками по дефолту
+            game.GameEnded += game_GameEnded;
+            UpdatePictureField();
+        }
+        /// <summary>
+        /// Игра средней сложности
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mediunGame_Click(object sender, EventArgs e)
+        {
+            this.MinimumSize = new Size(200 + (20 * 7), 253 + (20 * 7));
+            this.MaximumSize = new Size(200 + (20 * 7), 253 + (20 * 7));
+            game = new Game(GameDifficulty.Medium); // Создали новую игру с настройками по дефолту
+            game.GameEnded += game_GameEnded;
+            UpdatePictureField();
+        }
+        /// <summary>
+        /// Игра сложной сложности
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void hardGame_Click(object sender, EventArgs e)
+        {
+            this.MinimumSize = new Size(200 + (20 * 21), 253 + (20 * 7));
+            this.MaximumSize = new Size(200 + (20 * 21), 253 + (20 * 7));
+            game = new Game(GameDifficulty.Hard); // Создали новую игру с настройками по дефолту
             game.GameEnded += game_GameEnded;
             UpdatePictureField();
         }
@@ -85,9 +113,9 @@ namespace Sapper
         {
             if (this._pictureBoxsField != null) // Чистим поле формы
             {
-                for (int y = 0; y < game.HeightArray; y++)
+                for (int y = 0; y < _pictureBoxsField.GetLength(0); y++)
                 {
-                    for (int x = 0; x < game.WidthArray; x++)
+                    for (int x = 0; x < _pictureBoxsField.GetLength(1); x++)
                     {
                         this.Controls.Remove(this._pictureBoxsField[y, x]);
                     }
@@ -152,9 +180,16 @@ namespace Sapper
         private void pictureBoxsField_MouseUp(object sender, MouseEventArgs e)
         {
             var pictureBoxs = (PictureBox)sender;
-            int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
-            int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
-            if (e.Button == MouseButtons.Left)
+            NameResolution nameResolution = new NameResolution();
+            //int strx = name.X(pictureBoxs.Name);
+            //int stry = name.Y(pictureBoxs.Name);
+            //int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
+            //int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
+            int x = nameResolution.X(pictureBoxs.Name); // Ширина
+            int y = nameResolution.Y(pictureBoxs.Name); // Высота
+            if (e.Button == MouseButtons.Left
+            && e.Location.X >= 0 && e.Location.X <= 20
+            && e.Location.Y >= 0 && e.Location.Y <= 20)
             {
                 if (game.ShowClosedCell(x, y) == 2)
                 {
@@ -166,7 +201,9 @@ namespace Sapper
                     _pictureBoxsField[y, x].Image = Sapper.Properties.Resources.Enable_Field;
                 }
             }
-            else if (e.Button == MouseButtons.Right)
+            else if (e.Button == MouseButtons.Right
+            && e.Location.X >= 0 && e.Location.X <= 20
+            && e.Location.Y >= 0 && e.Location.Y <= 20)
             {
                 if (game.ShowClosedCell(x, y) == 2)
                 {
@@ -195,8 +232,13 @@ namespace Sapper
             if (right && left) // Если нажата обе кнопки мыши
             {
                 var pictureBoxs = (PictureBox)sender;
-                int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
-                int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
+                NameResolution nameResolution = new NameResolution();
+                //int strx = nameResolution.X(pictureBoxs.Name);
+                //int stry = nameResolution.Y(pictureBoxs.Name);
+                //int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
+                //int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
+                int x = nameResolution.X(pictureBoxs.Name); // Ширина
+                int y = nameResolution.Y(pictureBoxs.Name); // Высота
                 int numeric = game.Field(x, y);
 
                 int count = 0;
@@ -205,7 +247,6 @@ namespace Sapper
                     for (int x2 = x - 1; x2 <= x + 1; x2++)
                     {
                         if (x2 >= 0 && y2 >= 0
-                            //&& x2 != x && y2 != y // Обманка, без неё можно открывать поле.
                             && x2 <= x + 1 && y2 <= y + 1
                             && x2 < game.WidthArray && y2 < game.HeightArray)
                          {

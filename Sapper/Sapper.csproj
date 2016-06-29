@@ -51,6 +51,7 @@
     <Compile Include="MainFormSapper.Designer.cs">
       <DependentUpon>MainFormSapper.cs</DependentUpon>
     </Compile>
+    <Compile Include="NameResolution.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainFormSapper.resx">
