@@ -204,7 +204,7 @@ namespace Sapper
         public void FieldClosedCell(int x, int y)
         {
             _fieldClosedCell[y, x] = 2;
-            PointsForWin++; // Закрываем ячейку
+            if (_field[y, x] == -1) PointsForWin++; // Закрываем ячейку
         }
         /// <summary>
         /// Обозначить ячейку поля помеченной (поставить флажок)
@@ -308,7 +308,7 @@ namespace Sapper
         public void MarkCell(int x, int y)
         {
             FieldMarkCell(x, y);
-            PointsForWin--; // Ещё одна ячейка открыта
+            if (_field[y, x] == -1) PointsForWin--; // Ещё одна ячейка открыта
         }
         /// <summary>
         /// Рекурсивный алгоритм по открыванию нулевых ячеек массива

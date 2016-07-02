@@ -60,21 +60,21 @@
             // easyGame
             // 
             this.easyGame.Name = "easyGame";
-            this.easyGame.Size = new System.Drawing.Size(152, 22);
+            this.easyGame.Size = new System.Drawing.Size(153, 22);
             this.easyGame.Text = "Easy Game";
             this.easyGame.Click += new System.EventHandler(this.easyGame_Click);
             // 
             // mediunGame
             // 
             this.mediunGame.Name = "mediunGame";
-            this.mediunGame.Size = new System.Drawing.Size(152, 22);
-            this.mediunGame.Text = "Mediun Game";
+            this.mediunGame.Size = new System.Drawing.Size(153, 22);
+            this.mediunGame.Text = "Medium Game";
             this.mediunGame.Click += new System.EventHandler(this.mediunGame_Click);
             // 
             // hardGame
             // 
             this.hardGame.Name = "hardGame";
-            this.hardGame.Size = new System.Drawing.Size(152, 22);
+            this.hardGame.Size = new System.Drawing.Size(153, 22);
             this.hardGame.Text = "Hard Game";
             this.hardGame.Click += new System.EventHandler(this.hardGame_Click);
             // 

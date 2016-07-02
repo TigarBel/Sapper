@@ -6,3 +6,4 @@ D:\Винотека\Sapper\Sapper\obj\Release\Sapper.Properties.Resources.resour
 D:\Винотека\Sapper\Sapper\obj\Release\Sapper.csproj.GenerateResource.Cache
 D:\Винотека\Sapper\Sapper\obj\Release\Sapper.exe
 D:\Винотека\Sapper\Sapper\obj\Release\Sapper.pdb
+D:\Винотека\Sapper\Sapper\obj\Release\Sapper.csprojResolveAssemblyReference.cache

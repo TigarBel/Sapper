@@ -36,6 +36,7 @@ namespace Sapper
         public MainFormSapper()
         {
             InitializeComponent();
+            DoubleBuffered = true; //!!!//
         }
         /// <summary>
         /// Новая игра лёгкой сложности
