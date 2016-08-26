@@ -14,6 +14,10 @@ namespace Sapper
     public partial class MainFormSapper : Form
     {
         /// <summary>
+        /// Работа таймера
+        /// </summary>
+        bool timerOn;
+        /// <summary>
         /// Объект игры, где проходит вся логига, собственно, игры
         /// </summary>
         Game game;
@@ -48,7 +52,10 @@ namespace Sapper
             this.MinimumSize = new Size(200, 253);
             this.MaximumSize = new Size(200, 253);
             game = new Game(GameDifficulty.Easy); // Создали новую игру с настройками по дефолту
+
             game.GameEnded += game_GameEnded;
+            labelOfTimer.Text = "0";
+
             UpdatePictureField();
         }
         /// <summary>
@@ -61,7 +68,10 @@ namespace Sapper
             this.MinimumSize = new Size(200 + (20 * 7), 253 + (20 * 7));
             this.MaximumSize = new Size(200 + (20 * 7), 253 + (20 * 7));
             game = new Game(GameDifficulty.Medium); // Создали новую игру с настройками по дефолту
+
             game.GameEnded += game_GameEnded;
+            labelOfTimer.Text = "0";
+
             UpdatePictureField();
         }
         /// <summary>
@@ -74,8 +84,38 @@ namespace Sapper
             this.MinimumSize = new Size(200 + (20 * 21), 253 + (20 * 7));
             this.MaximumSize = new Size(200 + (20 * 21), 253 + (20 * 7));
             game = new Game(GameDifficulty.Hard); // Создали новую игру с настройками по дефолту
+
             game.GameEnded += game_GameEnded;
+            labelOfTimer.Text = "0";
+
             UpdatePictureField();
+        }
+        /// <summary>
+        /// Событие при начале игры (запуск таймера)
+        /// </summary>
+        /// <param name="start">Старт</param>
+        private void GameStarted(bool start)
+        {
+            if (start == true && timerOn == false)
+            {
+                timer1.Start();
+                labelOfTimer.Text = "0";
+                timerOn = true;
+            }
+            if (start == false)
+            {
+                timer1.Stop();
+                timerOn = false;
+            }
+        }
+        /// <summary>
+        /// Событие при тиканье таймера
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            labelOfTimer.Text = Convert.ToString(Convert.ToInt32(labelOfTimer.Text) + 1);
         }
         /// <summary>
         /// Событие при завершении игры
@@ -83,8 +123,10 @@ namespace Sapper
         /// <param name="points">Итог в очках, выигрыл или проигрыш</param>
         void game_GameEnded(int points)
         {
+            GameStarted(game.TimerOn = false);
             if (points == 0) MessageBox.Show("Вы выиграли!"); // Выигрыш
             if (points == -1) GameOver(); // Проигрыш
+            //GameStarted(game.TimerOn = false);// Иначе просто открываем данную ячейку (если работает данное условие)
         }
         /// <summary>
         /// Ф-ция под событие для окончания игры, как проигрыш
@@ -103,7 +145,7 @@ namespace Sapper
                     {   // Если не обезвредили мину на данной ячейке
                         game.NonDefusedCell(x, y);
                     }   // Иначе просто открываем данную ячейку
-                    else if (game.ShowClosedCell(x, y) == 2) game.OpenCell(x, y);
+                    //else if (game.ShowClosedCell(x, y) == 2) game.OpenCell(x, y);
                 }
             }
         }
@@ -172,6 +214,7 @@ namespace Sapper
                     }
                 }
             }
+            GameStarted(game.TimerOn);
         }
         /// <summary>
         /// Скрипт при отпускании кнопки мыши
@@ -182,10 +225,6 @@ namespace Sapper
         {
             var pictureBoxs = (PictureBox)sender;
             NameResolution nameResolution = new NameResolution();
-            //int strx = name.X(pictureBoxs.Name);
-            //int stry = name.Y(pictureBoxs.Name);
-            //int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
-            //int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
             int x = nameResolution.X(pictureBoxs.Name); // Ширина
             int y = nameResolution.Y(pictureBoxs.Name); // Высота
             if (e.Button == MouseButtons.Left
@@ -234,10 +273,6 @@ namespace Sapper
             {
                 var pictureBoxs = (PictureBox)sender;
                 NameResolution nameResolution = new NameResolution();
-                //int strx = nameResolution.X(pictureBoxs.Name);
-                //int stry = nameResolution.Y(pictureBoxs.Name);
-                //int x = Convert.ToInt32(pictureBoxs.Name[0].ToString()); // Ширина
-                //int y = Convert.ToInt32(pictureBoxs.Name[2].ToString()); // Высота
                 int x = nameResolution.X(pictureBoxs.Name); // Ширина
                 int y = nameResolution.Y(pictureBoxs.Name); // Высота
                 int numeric = game.Field(x, y);

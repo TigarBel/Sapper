@@ -28,12 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainFormSapper));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.GameMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.easyGame = new System.Windows.Forms.ToolStripMenuItem();
             this.mediunGame = new System.Windows.Forms.ToolStripMenuItem();
             this.hardGame = new System.Windows.Forms.ToolStripMenuItem();
+            this.labelOfTimer = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -78,11 +81,27 @@
             this.hardGame.Text = "Hard Game";
             this.hardGame.Click += new System.EventHandler(this.hardGame_Click);
             // 
+            // labelOfTimer
+            // 
+            this.labelOfTimer.AutoSize = true;
+            this.labelOfTimer.BackColor = System.Drawing.SystemColors.Control;
+            this.labelOfTimer.Location = new System.Drawing.Point(155, 5);
+            this.labelOfTimer.Name = "labelOfTimer";
+            this.labelOfTimer.Size = new System.Drawing.Size(13, 13);
+            this.labelOfTimer.TabIndex = 1;
+            this.labelOfTimer.Text = "0";
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 1000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // MainFormSapper
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(184, 214);
+            this.Controls.Add(this.labelOfTimer);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(200, 253);
@@ -103,6 +122,8 @@
         private System.Windows.Forms.ToolStripMenuItem easyGame;
         private System.Windows.Forms.ToolStripMenuItem mediunGame;
         private System.Windows.Forms.ToolStripMenuItem hardGame;
+        private System.Windows.Forms.Label labelOfTimer;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

@@ -18,7 +18,7 @@ namespace Sapper
     /// <summary>
     /// Делегат для вызова события "Завершить игру"
     /// </summary>
-    public delegate void DelegateGameEnd(int points);
+    public delegate void DelegateGame(int points);
     /// <summary>
     /// Класс логики игры сапёра
     /// </summary>
@@ -49,9 +49,13 @@ namespace Sapper
         /// </summary>
         private int _pointsForWin;
         /// <summary>
+        /// Работа таймера
+        /// </summary>
+        private bool _timerOn;
+        /// <summary>
         /// Собитие по окончанию игры
         /// </summary>
-        public event DelegateGameEnd GameEnded;
+        public event DelegateGame GameEnded;
         /// <summary>
         /// Свойство по проверке проигрыша
         /// </summary>
@@ -66,6 +70,14 @@ namespace Sapper
                     PointsForWin = -1;
                 }
             }
+        }
+        /// <summary>
+        /// Работа таймер
+        /// </summary>
+        public bool TimerOn
+        {
+            get { return _timerOn; }
+            set { _timerOn = value; }
         }
         /// <summary>
         /// Свойство по проверки выигрыша. Если полученное число равно 0, то открыты (проверенны) все ячейки массива
@@ -292,6 +304,7 @@ namespace Sapper
         /// <returns>(0-пусто;-1-мина;1,2,3...-близость мин)</returns>
         public void OpenCell(int x, int y)
         {
+            TimerOn = true;
             FieldOpenCell(x, y);
             if (Field(x, y) == -1) // Встал на мину. Вызов события "Конец игры!"  
             {
@@ -307,6 +320,7 @@ namespace Sapper
         /// <param name="y">Высота</param>
         public void MarkCell(int x, int y)
         {
+            TimerOn = true;
             FieldMarkCell(x, y);
             if (_field[y, x] == -1) PointsForWin--; // Ещё одна ячейка открыта
         }
